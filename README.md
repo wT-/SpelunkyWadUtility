@@ -13,6 +13,6 @@ Usage
 * To unpack, run **unpack.py** or drag&drop a specific **.wad**/**.wix** file on it.
 * To repack modified files, dump them in the **repack** subdirectory as is. **Don't** make any extra directories there.
 * Run **repack.py**, which will rebuild the **.wad**/**.wix** files
-
+---
 * If you made a booboo, there are backups made on the first unpack named something like **.wad.orig**.
 * You can run the included convenience script **restore_original.py** to copy them over the current **.wad**/**.wix**.
