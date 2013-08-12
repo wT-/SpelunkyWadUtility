@@ -82,3 +82,4 @@ if __name__ == '__main__':
 					wad_file.seek(int(offset))
 					data = wad_file.read(int(size))
 					unpack_file(file_name, group, data)
+	os.makedirs("repack", exist_ok=True)
