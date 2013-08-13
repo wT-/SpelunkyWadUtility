@@ -5,10 +5,13 @@ Created on Aug 10, 2013
 @author: wT
 """
 
+import sys
+sys.dont_write_bytecode = True # It's just clutter for this small scripts
 import os
 from collections import OrderedDict
 
 from unpack import get_wad_path, get_wix_path, backup_files
+
 
 class File():
 	"""
