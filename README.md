@@ -3,7 +3,7 @@ SpelunkyWadUtility
 
 Unpacks and repacks the .wad&amp;.wix file pairs from the game Spelunky
 
-Requires Python 3. Or maybe it doesn't really require it, you can try with 2.7 too I guess /shrug. It's all standard library stuff.
+Requires at least Python 3.1, probably even newer version, so just get the latest. Tested on 3.3.2.
 
 Usage
 =====
