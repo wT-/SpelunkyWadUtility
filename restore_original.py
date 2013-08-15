@@ -8,15 +8,20 @@ Created on Aug 12, 2013
 import sys
 sys.dont_write_bytecode = True # It's just clutter for this small scripts
 import shutil
+import traceback
 
-from unpack import get_wad_path, get_wix_path
+from unpack import check_for_correct_python, get_wad_path, get_wix_path
 
 
 if __name__ == '__main__':
-	yesno = input(r"Overwrite both (potentially modified) .wad and .wix files with originals? [y/n]: ").lower()
-	if yesno == "y" or yesno == "yes":
-		shutil.copy2(get_wad_path() + ".orig", get_wad_path())
-		shutil.copy2(get_wix_path() + ".orig", get_wix_path())
-		print("Done")
-	else:
-		print("Not restoring")
+	try:
+		check_for_correct_python()
+		yesno = input(r"Overwrite both (potentially modified) .wad and .wix files with originals? [y/n]: ").lower()
+		if yesno == "y" or yesno == "yes":
+			shutil.copy2(get_wad_path() + ".orig", get_wad_path())
+			shutil.copy2(get_wix_path() + ".orig", get_wix_path())
+			print("Done")
+		else:
+			print("Not restoring")
+	except:
+		traceback.print_exc()

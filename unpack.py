@@ -8,6 +8,7 @@ Created on Aug 10, 2013
 import sys
 sys.dont_write_bytecode = True # It's just clutter for this small scripts
 import os
+import traceback
 import atexit
 
 
@@ -63,6 +64,11 @@ def backup_files():
 	if not os.path.exists(wad_file + ".orig"):
 		shutil.copy2(wad_file, wad_file + ".orig")
 
+def check_for_correct_python():
+	major_version = sys.version_info[0]
+	if major_version < 3:
+		sys.exit("Please use Python 3.x")
+
 def error_out_bad_input():
 	sys.exit("I need a .wad or .wix file, ya dingus")
 
@@ -72,16 +78,20 @@ def pause_on_exit():
 	os.system("pause") # os.system'ing anything is supposedly awful. Let's keep it for now
 
 if __name__ == '__main__':
-	backup_files()
+	try:
+		check_for_correct_python()
+		backup_files()
 
-	with open(get_wad_path(), mode='rb') as wad_file:
-		with open(get_wix_path(), mode="r") as index_file:
-			for line in index_file:
-				if line.startswith("!group"):
-					_, group = line.split()
-				else:
-					file_name, offset, size = line.split()
-					wad_file.seek(int(offset))
-					data = wad_file.read(int(size))
-					unpack_file(file_name, group, data)
-	os.makedirs("repack", exist_ok=True)
+		with open(get_wad_path(), mode='rb') as wad_file:
+			with open(get_wix_path(), mode="r") as index_file:
+				for line in index_file:
+					if line.startswith("!group"):
+						_, group = line.split()
+					else:
+						file_name, offset, size = line.split()
+						wad_file.seek(int(offset))
+						data = wad_file.read(int(size))
+						unpack_file(file_name, group, data)
+		os.makedirs("repack", exist_ok=True)
+	except:
+		traceback.print_exc()

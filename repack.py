@@ -9,8 +9,9 @@ import sys
 sys.dont_write_bytecode = True # It's just clutter for this small scripts
 import os
 from collections import OrderedDict
+import traceback
 
-from unpack import get_wad_path, get_wix_path, backup_files
+from unpack import check_for_correct_python, get_wad_path, get_wix_path, backup_files
 
 
 class File():
@@ -90,45 +91,47 @@ def write_new_wad(processed_file_list, first_change):
 
 
 if __name__ == '__main__':
-	backup_files()
+	try:
+		check_for_correct_python()
+		backup_files()
+		file_index = OrderedDict() # The original .wix file as dict
+		processed_file_list = set() # I swear it'll be a list in a moment
 
-	file_index = OrderedDict() # The original .wix file as dict
-	processed_file_list = set() # I swear it'll be a list in a moment
+		with open(get_wix_path() + ".orig", mode="r") as index_file:
+			for line in index_file:
+				if line.startswith("!group"):
+					_, group_name = line.split()
+					group = []
+					file_index[group_name] = group
+				else:
+					file = File(*line.split())
+					file.add_group(group_name)
+					group.append(file)
+					processed_file_list.add(file)
 
-	with open(get_wix_path() + ".orig", mode="r") as index_file:
-		for line in index_file:
-			if line.startswith("!group"):
-				_, group_name = line.split()
-				group = []
-				file_index[group_name] = group
-			else:
-				file = File(*line.split())
-				file.add_group(group_name)
-				group.append(file)
-				processed_file_list.add(file)
+		processed_file_list = sorted(list(processed_file_list), key=lambda file: file.offset) # That's ugly
 
-	processed_file_list = sorted(list(processed_file_list), key=lambda file: file.offset) # That's ugly
+		scan_repack_dir(processed_file_list)
 
-	scan_repack_dir(processed_file_list)
+		first_change = None
 
-	first_change = None
+		for index, file in enumerate(processed_file_list):
+			if file.new_size:
+				if not first_change:
+					first_change = index
+				shift_offsets(processed_file_list, index)
+			elif file.should_repack: # In case the new file manages to be exactly the same size as before
+				if not first_change:
+					first_change = index
 
-	for index, file in enumerate(processed_file_list):
-		if file.new_size:
-			if not first_change:
-				first_change = index
-			shift_offsets(processed_file_list, index)
-		elif file.should_repack: # In case the new file manages to be exactly the same size as before
-			if not first_change:
-				first_change = index
+		# Write the updated .wad
+		write_new_wad(processed_file_list, first_change)
 
-	# Write the updated .wad
-	write_new_wad(processed_file_list, first_change)
-
-	# Write the modified .wix
-	with open(get_wix_path(), mode='w') as index_file:
-		for group, items in file_index.items():
-			index_file.write("!group {}\n".format(group))
-			for item in items:
-				index_file.write("{} {} {}\n".format(item.filename, item.new_offset or item.offset, item.new_size or item.size))
-
+		# Write the modified .wix
+		with open(get_wix_path(), mode='w') as index_file:
+			for group, items in file_index.items():
+				index_file.write("!group {}\n".format(group))
+				for item in items:
+					index_file.write("{} {} {}\n".format(item.filename, item.new_offset or item.offset, item.new_size or item.size))
+	except:
+		traceback.print_exc()
