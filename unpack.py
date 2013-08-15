@@ -93,5 +93,7 @@ if __name__ == '__main__':
 						data = wad_file.read(int(size))
 						unpack_file(file_name, group, data)
 		os.makedirs("repack", exist_ok=True)
+	except SystemExit as e:
+		print(e)
 	except:
 		traceback.print_exc()

@@ -23,5 +23,7 @@ if __name__ == '__main__':
 			print("Done")
 		else:
 			print("Not restoring")
+	except SystemExit as e:
+		print(e)
 	except:
 		traceback.print_exc()

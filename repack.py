@@ -133,5 +133,7 @@ if __name__ == '__main__':
 				index_file.write("!group {}\n".format(group))
 				for item in items:
 					index_file.write("{} {} {}\n".format(item.filename, item.new_offset or item.offset, item.new_size or item.size))
+	except SystemExit as e:
+		print(e)
 	except:
 		traceback.print_exc()
