@@ -3,7 +3,7 @@
 Created on Aug 12, 2013
 
 @author: wT
-@version: 1.0
+@version: 1.1
 """
 
 import sys
