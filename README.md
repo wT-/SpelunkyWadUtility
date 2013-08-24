@@ -1,9 +1,9 @@
 SpelunkyWadUtility v1.2
 =======================
 
-Unpacks and repacks the .wad&amp;.wix file pairs from the game Spelunky
+Unpacks and repacks the .wad&amp;.wix file pairs from the game [Spelunky by Mossmouth](http://spelunkyworld.com/)
 
-Requires at least Python 2.6 or Python 3.1, but untested on those. Tested to work on 2.7 and 3.3.
+Tested on Python 2.7 and Python 3.3. Older versions **might** work but YMMV.
 Update your Python if you're having problems.
 
 Usage
@@ -22,6 +22,6 @@ Notes
 * You can run the included convenience script **restore_original.py** to move them over the current **.wad**.
 * In case of game updates that change the **.wad** file you've modified, I'd suggest doing this:
   * Make sure you got at least version 1.1 of my scripts
-  * Run **restore_original.py** script to get rid of the old .origs
-  * Go on Steam and "Verify integrity of game cache" or get the original files some other way, if you downloaded from GOG for an example
+  * Run **restore_original.py** script to get rid of the old .origs.
+  * Go on Steam and "Verify integrity of game cache" or get the new files some other way, if you downloaded from GOG for an example.
   * Run **repack.py** to repack your modifications over the now updated **.wad**
