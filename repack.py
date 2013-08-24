@@ -1,21 +1,25 @@
-#!python3
+#!/usr/bin/env python
 """
 Created on Aug 10, 2013
 
 @author: wT
-@version: 1.1
+@version: 1.2
 """
+
+from __future__ import print_function, unicode_literals
 
 import sys
 sys.dont_write_bytecode = True # It's just clutter for this small scripts
+
 import os
+import io
 from collections import OrderedDict
 import traceback
 
-from unpack import check_for_correct_python, get_wad_path, get_wix_path, backup_files
+from unpack import get_wad_path, get_wix_path, prepare_directory
 
 
-class File():
+class File(object):
 	"""
 	Represents a file entry in the index file
 	Only have one instance per filename
@@ -26,7 +30,7 @@ class File():
 	def __new__(cls, *args, **kwargs):
 		file_name = args[0]
 		if not file_name in cls._instances.keys():
-			cls._instances[file_name] = super().__new__(cls)
+			cls._instances[file_name] = super(File, cls).__new__(cls)
 		elif len(args) == 4: # File exists but group is probably new, so add it
 			cls._instances[file_name].add_group(args[3])
 		return cls._instances[file_name]
@@ -79,11 +83,11 @@ def shift_offsets(file_list, item_index):
 			file.new_offset = file.offset - size_difference
 
 def write_new_wad(processed_file_list, first_change):
-	with open(get_wad_path(), mode='wb') as wad_file:
-		with open(get_wad_path() + ".orig", mode="rb") as orig_wad_file:
+	with io.open(get_wad_path(), mode='wb') as wad_file:
+		with io.open(get_wad_path() + ".orig", mode="rb") as orig_wad_file:
 			for file in processed_file_list:
 				if file.should_repack:
-					with open(os.path.join("repack", file.filename), mode='rb') as input_file:
+					with io.open(os.path.join("repack", file.filename), mode='rb') as input_file:
 						wad_file.write(input_file.read())
 				else:
 					orig_wad_file.seek(file.offset)
@@ -93,12 +97,12 @@ def write_new_wad(processed_file_list, first_change):
 
 if __name__ == '__main__':
 	try:
-		check_for_correct_python()
-		backup_files()
-		file_index = OrderedDict() # The original .wix file as dict
-		processed_file_list = set() # I swear it'll be a list in a moment
+		prepare_directory()
 
-		with open(get_wix_path() + ".orig", mode="r") as index_file:
+		file_index = OrderedDict() # The original .wix file as dict
+		processed_file_list = set() # I promise it'll be a list in a moment
+
+		with io.open(get_wix_path() + ".orig", mode="r") as index_file:
 			for line in index_file:
 				if line.startswith("!group"):
 					_, group_name = line.split()
@@ -115,7 +119,6 @@ if __name__ == '__main__':
 		scan_repack_dir(processed_file_list)
 
 		first_change = None
-
 		for index, file in enumerate(processed_file_list):
 			if file.new_size:
 				if not first_change:
@@ -129,7 +132,7 @@ if __name__ == '__main__':
 		write_new_wad(processed_file_list, first_change)
 
 		# Write the modified .wix
-		with open(get_wix_path(), mode='w') as index_file:
+		with io.open(get_wix_path(), mode='w') as index_file:
 			for group, items in file_index.items():
 				index_file.write("!group {}\n".format(group))
 				for item in items:
